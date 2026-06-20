@@ -4,6 +4,10 @@
 
 [![CI](https://github.com/jeffrey2423/commit-like-pro/actions/workflows/ci.yml/badge.svg)](https://github.com/jeffrey2423/commit-like-pro/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/commit-like-pro.svg)](https://www.npmjs.com/package/commit-like-pro)
+[![npm downloads](https://img.shields.io/npm/dm/commit-like-pro.svg)](https://www.npmjs.com/package/commit-like-pro)
+[![node](https://img.shields.io/node/v/commit-like-pro.svg)](https://www.npmjs.com/package/commit-like-pro)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://www.conventionalcommits.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 Most AI commit helpers do one expensive thing: they shove your entire `git diff`
@@ -74,11 +78,24 @@ first rule is **don't load that by default** — survey with `--stat` and filena
 and pull line-level diffs only for the handful of files where intent is genuinely
 ambiguous. On a typical change the whole task costs a few hundred tokens.
 
-## Contributing
+## Contributing & governance
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). The skill itself
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[Code of Conduct](CODE_OF_CONDUCT.md). The skill itself
 (`skill/commit-like-pro/SKILL.md`) is the product — keep it short, imperative, and
 faithful to the token-discipline and guardrails.
+
+**How changes land.** The `main` branch is protected:
+
+- Every change goes through a **pull request** — no direct pushes, maintainer included.
+- **CI must pass** (`Installer smoke test` on Node 18 / 20 / 22) before a PR can merge.
+- Force-pushes and deletion of `main` are blocked.
+- **Releases are automated** — bump `version` in `package.json`, merge to `main`, and the
+  workflow publishes to npm and opens the matching `vX.Y.Z` GitHub Release.
+
+To contribute: branch from `main`, commit with
+[Conventional Commits](https://www.conventionalcommits.org/) (this project commits like a
+pro 🙂), open a PR, and make sure CI is green.
 
 ## License
 
