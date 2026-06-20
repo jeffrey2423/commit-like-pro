@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    name: Installer smoke test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Help output
+        run: node bin/cli.js --help
+
+      - name: Install into a scratch project
+        run: |
+          mkdir -p /tmp/scratch
+          cd /tmp/scratch
+          node "$GITHUB_WORKSPACE/bin/cli.js" --project --with-agents --yes
+          test -f .claude/skills/commit-like-pro/SKILL.md
+          test -f AGENTS.md
+          grep -q "commit-like-pro:start" AGENTS.md
+
+      - name: Re-run is idempotent (AGENTS.md block not duplicated)
+        run: |
+          cd /tmp/scratch
+          node "$GITHUB_WORKSPACE/bin/cli.js" --project --with-agents --yes
+          test "$(grep -c 'commit-like-pro:start' AGENTS.md)" -eq 1
+
+      - name: Global install target
+        run: |
+          node "$GITHUB_WORKSPACE/bin/cli.js" --global --yes
+          test -f "$HOME/.claude/skills/commit-like-pro/SKILL.md"
+
+      - name: Package contents (no node_modules leak)
+        run: |
+          npm pack --dry-run --json > pack.json
+          node -e "const f=require('./pack.json')[0].files.map(x=>x.path); if(f.some(p=>p.includes('node_modules'))){console.error('node_modules leaked!');process.exit(1)}; console.log('package files:', f.length)"
