@@ -24,7 +24,7 @@
     "templates/"
   ],
   "dependencies": {
-    "@clack/prompts": "^0.7.0"
+    "@clack/prompts": "^1.6.0"
   },
   "keywords": [
     "git",
