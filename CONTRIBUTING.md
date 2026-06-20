@@ -51,8 +51,13 @@ The skill is the product. When you change `skill/commit-like-pro/SKILL.md`:
 
 ## Releases
 
-Merging to `main` runs the publish workflow, which publishes to npm **only when
-`package.json`'s version changes**. Docs/meta changes ship without a bump.
+Merging to `main` runs the publish workflow. **Only when `package.json`'s version
+changes** does it publish to npm and then create the matching `vX.Y.Z` git tag and
+GitHub Release (notes are taken from the matching `CHANGELOG.md` section, falling
+back to auto-generated notes). Docs/meta changes ship without a bump.
+
+To cut a release: add a `## [X.Y.Z]` section to `CHANGELOG.md`, bump `version` in
+`package.json`, and merge to `main` — the rest is automatic.
 
 ## Code of Conduct
 

@@ -8,7 +8,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write   # create tags and GitHub releases
 
     steps:
       - uses: actions/checkout@v5
@@ -37,6 +37,31 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.local }}
+        run: |
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists — skipping."
+            exit 0
+          fi
+          # Pull the matching section out of CHANGELOG.md for the release notes;
+          # fall back to GitHub's auto-generated notes if there isn't one.
+          NOTES=$(awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { flag=1; next }
+            /^## \[/ && flag { flag=0 }
+            flag { print }
+          ' CHANGELOG.md)
+          if [ -n "$(echo "$NOTES" | tr -d '[:space:]')" ]; then
+            printf '%s\n' "$NOTES" > release-notes.md
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "$TAG" --notes-file release-notes.md
+          else
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "$TAG" --generate-notes
+          fi
 
       - name: Skip publish (version unchanged)
         if: steps.version.outputs.changed == 'false'

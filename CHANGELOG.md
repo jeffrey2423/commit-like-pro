@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Automated GitHub Releases: when `package.json`'s version changes, the publish
+  workflow creates the `vX.Y.Z` tag and a release with notes from `CHANGELOG.md`.
+- Dependabot config keeping GitHub Actions and npm dependencies current.
+
 ## [0.1.0] - 2026-06-20
 
 ### Added
