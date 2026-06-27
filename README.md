@@ -40,13 +40,14 @@ npx commit-like-pro
 The installer asks where to put the skill:
 
 - **This project** → `./.claude/skills/commit-like-pro/` (versioned with the repo,
-  shared with your team), and optionally an `AGENTS.md` pointer.
+  shared with your team), and optionally project agent pointers (`AGENTS.md` and
+  `.cursor/rules/commit-like-pro.mdc`).
 - **Global** → `~/.claude/skills/commit-like-pro/` (available in every repo).
 
 ### Non-interactive
 
 ```bash
-npx commit-like-pro --project --with-agents   # into the current repo + AGENTS.md
+npx commit-like-pro --project --with-agents   # current repo + agent pointers
 npx commit-like-pro --global --yes            # everywhere, no prompts
 ```
 
@@ -54,8 +55,8 @@ npx commit-like-pro --global --yes            # everywhere, no prompts
 |---|---|
 | `--project` | Install into `./.claude/skills` (default) |
 | `--global` | Install into `~/.claude/skills` |
-| `--with-agents` | Also add/refresh an `AGENTS.md` pointer (project installs) |
-| `--no-agents` | Skip the `AGENTS.md` pointer |
+| `--with-agents` | Also add/refresh `AGENTS.md` and `.cursor/rules/commit-like-pro.mdc` (project installs) |
+| `--no-agents` | Skip project agent pointers |
 | `--yes`, `-y` | Run non-interactively |
 | `--help`, `-h` | Show help |
 
@@ -67,9 +68,12 @@ npx commit-like-pro --global --yes            # everywhere, no prompts
 commit like a pro
 ```
 
-**Cursor / Copilot / other agents** — with `--with-agents`, the workflow is added
-to your project's `AGENTS.md`, which these tools read automatically. Or point your
-agent at `.claude/skills/commit-like-pro/SKILL.md` directly.
+**Cursor** — with `--with-agents`, the workflow is added to
+`.cursor/rules/commit-like-pro.mdc` so Cursor can surface it as a project rule.
+
+**Copilot / other agents** — with `--with-agents`, the workflow is also added to
+your project's `AGENTS.md`. Or point your agent at
+`.claude/skills/commit-like-pro/SKILL.md` directly.
 
 ## Why "token-efficient"?
 

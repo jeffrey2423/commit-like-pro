@@ -9,7 +9,7 @@ improvements, and bug fixes.
 ```
 bin/cli.js                          # installer (Node, only dep is @clack/prompts)
 skill/commit-like-pro/SKILL.md      # the skill itself — the heart of the project
-templates/AGENTS.snippet.md         # pointer block injected into a project's AGENTS.md
+templates/AGENTS.snippet.md         # pointer block injected into AGENTS.md / Cursor rules
 ```
 
 ## Local setup
