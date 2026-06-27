@@ -1,6 +1,6 @@
 {
   "name": "commit-like-pro",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Install a token-efficient AI skill that reviews your pending changes and writes senior-grade git commits — group, message, and commit like a pro.",
   "license": "MIT",
   "author": "Jeffrey Rios",

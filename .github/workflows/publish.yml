@@ -51,9 +51,11 @@ jobs:
           fi
           # Pull the matching section out of CHANGELOG.md for the release notes;
           # fall back to GitHub's auto-generated notes if there isn't one.
-          NOTES=$(awk -v ver="$VERSION" '
-            $0 ~ "^## \\[" ver "\\]" { flag=1; next }
-            /^## \[/ && flag { flag=0 }
+          # Matched with index() rather than a regex so the `[` in the header is
+          # always a literal bracket (gawk 5.x treats "\[" as a character class).
+          NOTES=$(awk -v hdr="## [$VERSION]" '
+            index($0, hdr) == 1 { flag=1; next }
+            /^## / && flag { flag=0 }
             flag { print }
           ' CHANGELOG.md)
           if [ -n "$(echo "$NOTES" | tr -d '[:space:]')" ]; then
