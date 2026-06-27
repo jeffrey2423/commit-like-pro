@@ -33,13 +33,16 @@ jobs:
           node "$GITHUB_WORKSPACE/bin/cli.js" --project --with-agents --yes
           test -f .claude/skills/commit-like-pro/SKILL.md
           test -f AGENTS.md
+          test -f .cursor/rules/commit-like-pro.mdc
           grep -q "commit-like-pro:start" AGENTS.md
+          grep -q "commit-like-pro:start" .cursor/rules/commit-like-pro.mdc
 
-      - name: Re-run is idempotent (AGENTS.md block not duplicated)
+      - name: Re-run is idempotent (agent blocks not duplicated)
         run: |
           cd /tmp/scratch
           node "$GITHUB_WORKSPACE/bin/cli.js" --project --with-agents --yes
           test "$(grep -c 'commit-like-pro:start' AGENTS.md)" -eq 1
+          test "$(grep -c 'commit-like-pro:start' .cursor/rules/commit-like-pro.mdc)" -eq 1
 
       - name: Global install target
         run: |

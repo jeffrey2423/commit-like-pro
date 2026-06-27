@@ -13,6 +13,8 @@ All notable changes to this project are documented here. The format follows
 - Dependabot config keeping GitHub Actions and npm dependencies current.
 - Dependabot auto-merge for patch/minor updates once CI passes; major updates
   are flagged for manual review.
+- `--with-agents` now installs a native Cursor rule at
+  `.cursor/rules/commit-like-pro.mdc` alongside the `AGENTS.md` pointer.
 
 ## [0.1.0] - 2026-06-20
 

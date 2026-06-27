@@ -13,7 +13,7 @@ You can expect an initial response within a few business days.
 
 This package is an installer plus a markdown skill. It runs locally, has no
 network calls, and only writes files under the chosen install directory
-(`.claude/skills/` and, optionally, `AGENTS.md`). The skill itself instructs an
-AI agent to run **read-first** git commands and to never stage with
+(`.claude/skills/` and, optionally, `AGENTS.md` plus `.cursor/rules/`). The
+skill itself instructs an AI agent to run **read-first** git commands and to never stage with
 `git add .`/`-A` blindly, never commit detected secrets, and never bypass hooks
 with `--no-verify` unless explicitly asked.

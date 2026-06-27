@@ -3,7 +3,7 @@
 // Installer for commit-like-pro.
 // Drops a token-efficient "commit like a pro" skill where an AI coding agent
 // will find it: Claude Code's skills directory (project-local or global), plus
-// an optional AGENTS.md pointer so Cursor / Copilot / other tools pick it up too.
+// optional project agent pointers so Cursor / Copilot / other tools pick it up too.
 
 const fs = require("fs");
 const os = require("os");
@@ -14,6 +14,7 @@ const SKILL_SRC = path.join(PKG_ROOT, "skill", "commit-like-pro");
 const AGENTS_SNIPPET = path.join(PKG_ROOT, "templates", "AGENTS.snippet.md");
 
 const SKILL_REL = path.join(".claude", "skills", "commit-like-pro");
+const CURSOR_RULE_REL = path.join(".cursor", "rules", "commit-like-pro.mdc");
 const AGENTS_START = "<!-- commit-like-pro:start -->";
 const AGENTS_END = "<!-- commit-like-pro:end -->";
 
@@ -42,13 +43,16 @@ function installSkill(baseDir) {
 
 // ── AGENTS.md pointer (project installs only) ────────────────────────────────
 // Idempotent: replace the marked block if present, else append (or create).
-function upsertAgentsPointer(baseDir) {
-  const target = path.join(baseDir, "AGENTS.md");
+function readAgentSnippet() {
   const snippet = fs.readFileSync(AGENTS_SNIPPET, "utf8").trim();
+  return snippet;
+}
+
+function upsertMarkedBlock(target, snippet, createContent) {
+  fs.mkdirSync(path.dirname(target), { recursive: true });
 
   if (!fs.existsSync(target)) {
-    const header = "# Project agent instructions\n\n";
-    fs.writeFileSync(target, header + snippet + "\n");
+    fs.writeFileSync(target, createContent(snippet));
     return { target, action: "created" };
   }
 
@@ -66,6 +70,21 @@ function upsertAgentsPointer(baseDir) {
   const sep = current.endsWith("\n") ? "\n" : "\n\n";
   fs.writeFileSync(target, current + sep + snippet + "\n");
   return { target, action: "appended" };
+}
+
+function upsertAgentsPointer(baseDir) {
+  const target = path.join(baseDir, "AGENTS.md");
+  const snippet = readAgentSnippet();
+  return upsertMarkedBlock(target, snippet, (body) => {
+    const header = "# Project agent instructions\n\n";
+    return header + body + "\n";
+  });
+}
+
+function upsertCursorRule(baseDir) {
+  const target = path.join(baseDir, CURSOR_RULE_REL);
+  const snippet = readAgentSnippet();
+  return upsertMarkedBlock(target, snippet, (body) => body + "\n");
 }
 
 // ── Flags ────────────────────────────────────────────────────────────────────
@@ -99,7 +118,7 @@ async function interactive() {
   let withAgents = false;
   if (scope === "project") {
     const ans = await p.confirm({
-      message: "Also add an AGENTS.md pointer? (lets Cursor / Copilot / other tools use it too)",
+      message: "Also add project agent pointers? (AGENTS.md plus a Cursor rule)",
       initialValue: true,
     });
     if (p.isCancel(ans)) cancel(p);
@@ -126,8 +145,8 @@ Usage:
 Flags:
   --project            install into ./.claude/skills (default)
   --global             install into ~/.claude/skills (all your repos)
-  --with-agents        also add/refresh an AGENTS.md pointer (project installs)
-  --no-agents          skip the AGENTS.md pointer
+  --with-agents        also add/refresh AGENTS.md and Cursor rule pointers (project installs)
+  --no-agents          skip project agent pointers
   --yes, -y            run non-interactively with the given flags / defaults
   --help, -h           show this help
 
@@ -168,15 +187,20 @@ async function main() {
   console.log(`  → ${dest}`);
 
   if (sel.withAgents) {
-    const { target, action } = upsertAgentsPointer(baseDir);
-    console.log(`✓ ${action === "created" ? "Created" : action === "updated" ? "Refreshed" : "Updated"} AGENTS.md pointer`);
-    console.log(`  → ${target}`);
+    for (const { label, result } of [
+      { label: "AGENTS.md pointer", result: upsertAgentsPointer(baseDir) },
+      { label: "Cursor rule", result: upsertCursorRule(baseDir) },
+    ]) {
+      const { target, action } = result;
+      console.log(`✓ ${action === "created" ? "Created" : action === "updated" ? "Refreshed" : "Updated"} ${label}`);
+      console.log(`  → ${target}`);
+    }
   }
 
   console.log(`
 Next:
   • Claude Code  — just say "commit like a pro" (the skill loads on demand).
-  • Other tools  — point your agent at the SKILL.md${sel.withAgents ? " / AGENTS.md" : ""} above.
+  • Other tools  — point your agent at the SKILL.md${sel.withAgents ? " / AGENTS.md / Cursor rule" : ""} above.
 `);
 }
 
